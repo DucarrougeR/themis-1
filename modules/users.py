@@ -22,13 +22,9 @@ class Users:
     def get_users_issue(self):
         '''Returns locked out users for the Looker instance'''
         all_users = self.looker_client.all_users(fields='id, is_disabled')
-        disabled_users = []
+        disabled_users = [i for i in all_users if i.is_disabled]
 
-        for i in all_users:
-            if i.is_disabled:
-                disabled_users.append(i)
-        user_results = []
-        user_results.append("Disabled Looker users: {}".format(len(disabled_users)))
+        user_results = ["Disabled Looker users: {}".format(len(disabled_users))]
         locked_out = self.looker_client.all_user_login_lockouts()
         user_results.append("Locked Out Looker users: {}".format(len(locked_out)))
         return user_results

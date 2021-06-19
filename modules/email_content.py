@@ -5,7 +5,7 @@ from weasyprint import HTML, CSS
 def email_body(looker_url, looker_version, total_users, total_projects, total_erring_content, total_schedules,
                total_pdt_errors, pdt_less_30, pdt_30_60, pdt_over_60, unlimited_queries, total_connections, total_integrations, total_datagroups):
     '''Generates the summary body for the email'''
-    body = '''
+    return '''
         Today's Report:<br><br>
         Looker instance: {}<br>
         Looker version: {}
@@ -41,19 +41,22 @@ def email_body(looker_url, looker_version, total_users, total_projects, total_er
             Find more information <a href="https://github.com/looker-open-source/Themis">go to the repo</a>
         <br>
             Something Wrong? <a href="https://github.com/looker-open-source/Themis">Tell us</a>
-        </font>'''.format(looker_version,
-                          looker_url,
-                          total_users,
-                          total_projects,
-                          total_erring_content,
-                          total_schedules,
-                          total_pdt_errors,
-                          pdt_less_30, pdt_30_60, pdt_over_60,
-                          unlimited_queries,
-                          total_connections,
-                          total_integrations,
-                          total_datagroups)
-    return body
+        </font>'''.format(
+        looker_version,
+        looker_url,
+        total_users,
+        total_projects,
+        total_erring_content,
+        total_schedules,
+        total_pdt_errors,
+        pdt_less_30,
+        pdt_30_60,
+        pdt_over_60,
+        unlimited_queries,
+        total_connections,
+        total_integrations,
+        total_datagroups,
+    )
 
 
 def email_attachment(looker_version, looker_url, total_users, user_details, total_projects,
@@ -85,12 +88,12 @@ def email_attachment(looker_version, looker_url, total_users, user_details, tota
                                   list_errors_schedules = list_errors_schedules,
                                   total_pdt_errors = total_pdt_errors, 
                                   list_pdt_errors = list_pdt_errors,
-                                  
+
                                   unlimited_queries = unlimited_queries, 
                                   report_url = report_url, 
                                   is_clustered = is_clustered, 
                                   list_nodes = list_nodes,
-                                  
+
                                   total_connections = total_connections,
                                   list_errors_connections = list_errors_connections,
 
@@ -100,9 +103,8 @@ def email_attachment(looker_version, looker_url, total_users, user_details, tota
                                   total_datagroups = total_datagroups,
                                   list_errors_datagroups = list_errors_datagroups
                                   )
-    html_file = open('./modules/rendering/rendered_version.html', 'w')
-    html_file.write(output_text)
-    html_file.close()
+    with open('./modules/rendering/rendered_version.html', 'w') as html_file:
+        html_file.write(output_text)
     HTML(filename='./modules/rendering/rendered_version.html').write_pdf('./modules/rendering/final_attachment.pdf', 
         stylesheets=[CSS(string='@page {{ font-family:arial, serif; font-size: 6; }}')])
 

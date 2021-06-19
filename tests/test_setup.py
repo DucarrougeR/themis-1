@@ -13,10 +13,12 @@ class LookerSDKTestCase(unittest.TestCase):
     def test_looker_credentials(self):
         '''Tests if a looker.ini file is created in the top level dir. Will fail if using env var'''
         parent_dir = Path(__file__).parents[1]
-        cred_file = []
-        for file in os.listdir(parent_dir):
-            if file.endswith(".ini"):
-                cred_file.append(os.path.join(parent_dir, file))
+        cred_file = [
+            os.path.join(parent_dir, file)
+            for file in os.listdir(parent_dir)
+            if file.endswith(".ini")
+        ]
+
         self.assertTrue(cred_file or self.__class__.base_url and self.__class__.api_id and self.__class__.api_secret, msg="Looker Credentials Not Found")
     
 
@@ -28,8 +30,8 @@ class LookerSDKTestCase(unittest.TestCase):
     def test_emails_format(self):
         '''Tests the format for recipient emails'''
         email_format_ok = []
+        regex = r'^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$'
         for email in self.__class__.email_list.split(','):
-            regex = r'^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$'
             email = email.strip()
             if not (re.search(regex, str(email))):
                 email_format_ok.append(email_format_ok)

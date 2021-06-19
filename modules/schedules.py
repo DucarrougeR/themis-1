@@ -35,9 +35,13 @@ class Schedules:
         )
         schedules_query = self.looker_client.create_query(body)
         failed_schedules = self.looker_client.run_query(schedules_query.id, result_format='json')
-        cleaned_errors = []
-        for elem in json.loads(failed_schedules):
-            cleaned_errors.append("Schedule \'{}\' failed to send to {}".format(elem['scheduled_job.name'], elem['scheduled_plan_destination.type']))
+        cleaned_errors = [
+            "Schedule \'{}\' failed to send to {}".format(
+                elem['scheduled_job.name'], elem['scheduled_plan_destination.type']
+            )
+            for elem in json.loads(failed_schedules)
+        ]
+
         if failed_schedules:
             cleaned_errors = list(set(cleaned_errors)) # set to remove duplicates
             return cleaned_errors, len(json.loads(failed_schedules))
@@ -56,10 +60,13 @@ class Schedules:
         )
         failed_pdts = self.looker_client.create_query(body)
         failed_pdts_list = self.looker_client.run_query(failed_pdts.id, result_format='json')
-        cleaned_errors = []
-        for elem in json.loads(failed_pdts_list):
-            # cleaned_errors.append("PDT \'{}\' failed with error: {}".format(elem['pdt_event_log.view_name'], elem['error_message']))
-            cleaned_errors.append("PDT \'{}\' failed on connection: {}".format(elem['pdt_event_log.view_name'], elem['pdt_event_log.connection']))
+        cleaned_errors = [
+            "PDT \'{}\' failed on connection: {}".format(
+                elem['pdt_event_log.view_name'], elem['pdt_event_log.connection']
+            )
+            for elem in json.loads(failed_pdts_list)
+        ]
+
         if failed_pdts_list:
             cleaned_errors = list(set(cleaned_errors)) # set to remove duplicates
             # len(json.loads(failed_pdts_list))     will return the number of failures (# of PDTs * build attempts)

@@ -17,25 +17,22 @@ def get_looker_instance():
         config = configparser.ConfigParser()
         config.read('looker.ini')
         config_details = dict(config['Looker'])
-        instance_url = regex_base_url(config_details['base_url'])
-        return instance_url
+        return regex_base_url(config_details['base_url'])
     else:
         LOOKERSDK_BASE_URL = os.environ.get('LOOKERSDK_BASE_URL')
-        instance_url = regex_base_url(LOOKERSDK_BASE_URL)
-        return instance_url
+        return regex_base_url(LOOKERSDK_BASE_URL)
 
 def format_output(function_results):
     '''Formats list of errors in Looker to display first 20 elements'''
     if isinstance(function_results, (list)):
-        if len(function_results) >=1:
-            formatted_results = function_results[:20]
-            formatted_results.append('...')
-            return formatted_results
-        else:
+        if len(function_results) < 1:
             return ['No issues found.']
+        formatted_results = function_results[:20]
+        formatted_results.append('...')
+        return formatted_results
     elif isinstance(function_results, (tuple)): 
         formatted_results = list(function_results)[:20]
         formatted_results.append('...')
-        return formatted_results   
+        return formatted_results
     else:
         return function_results

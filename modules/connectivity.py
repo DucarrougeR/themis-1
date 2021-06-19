@@ -19,19 +19,22 @@ class Connectivity:
         db_errors = []
 
         for connection in all_connections:
-            if connection.name not in ('looker', 'looker__ilooker', 'looker__internal__analytics'):
-                if connection.dialect:
-                    connection_tests = {'tests': connection.dialect.connection_tests}
-                    for test in connection_tests['tests']:
-                        try:
-                            db_validation = self.looker_client.test_connection(connection.name, test)
-                            for item in db_validation:
-                                if item.status != 'success':
-                                    db_errors.append("Database Connection {} Test '{}' returned '{}'".format(connection.name,
-                                                                                                             item.name,
-                                                                                                             item.message))
-                        except Exception as e:
-                            print("Database Connection test for {} failed due to {}".format(connection.name, e))
+            if (
+                connection.name
+                not in ('looker', 'looker__ilooker', 'looker__internal__analytics')
+                and connection.dialect
+            ):
+                connection_tests = {'tests': connection.dialect.connection_tests}
+                for test in connection_tests['tests']:
+                    try:
+                        db_validation = self.looker_client.test_connection(connection.name, test)
+                        for item in db_validation:
+                            if item.status != 'success':
+                                db_errors.append("Database Connection {} Test '{}' returned '{}'".format(connection.name,
+                                                                                                         item.name,
+                                                                                                         item.message))
+                    except Exception as e:
+                        print("Database Connection test for {} failed due to {}".format(connection.name, e))
         return db_errors
 
     def count_all_integrations(self):
@@ -53,9 +56,6 @@ class Connectivity:
                         integration_errors.append("SUCCESS - Integration {} connectivity test".format(elem.label))
                 except Exception as e:
                     integration_errors.append("Integration {} connectivity test could not run due to {}".format(elem.label, e))
-            else:
-                # integration_errors.append("Integration {} not enabled.".format(elem.label))
-                pass
         return integration_errors
 
     def count_all_datagroups(self):
@@ -65,10 +65,10 @@ class Connectivity:
     def test_datagroups(self):
         '''Tests the datagroups and returns failures'''
         all_datagroups = self.looker_client.all_datagroups()
-        group_errors = []
-        for elem in all_datagroups:
-            if elem.trigger_error:
-                group_errors.append("Datagroup \"{}\" on model \"{}\" has this error:\t{}".format(elem.name,
-                                                                                                  elem.model_name,
-                                                                                                  elem.trigger_error))
-        return group_errors
+        return [
+            "Datagroup \"{}\" on model \"{}\" has this error:\t{}".format(
+                elem.name, elem.model_name, elem.trigger_error
+            )
+            for elem in all_datagroups
+            if elem.trigger_error
+        ]
