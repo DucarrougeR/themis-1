@@ -15,10 +15,7 @@ class Projects:
     def all_projects(self):
         '''Returns the list of projects'''
         my_projects = self.looker_client.all_projects(fields='id,name')
-        project_ids = []
-        for i in range(0, len(my_projects)):
-            project_ids.append(my_projects[i].id)
-        return project_ids
+        return [my_projects[i].id for i in range(len(my_projects))]
 
     def validate_lookml(self, project_id):
         '''Returns LookML validation errors'''
@@ -48,8 +45,6 @@ class Projects:
                 one_test = self.looker_client.run_git_connection_test(project_id, test_id.id)
                 if one_test.status != "pass":
                     git_tests.append("Test ID: {} failed on Project: {}".format(test_id.id, project_id))
-        else:
-            pass
         # change session back to 'production'
         self.looker_client.update_session({"workspace_id": "production"})
         return git_tests
@@ -75,8 +70,5 @@ class Projects:
     def run_lookml_test(self, project_id):
         '''Runs the LookML tests'''
         results = self.looker_client.run_lookml_test(project_id)
-        if not results:
-            pass
-            # return "No test set up on Project: {}".format(project_id)
-        else:
+        if results:
             return results

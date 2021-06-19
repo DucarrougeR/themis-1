@@ -13,9 +13,7 @@ def send_report_out(content):
     try:
       # format env variable like: 'example1@mail.com,example2@mail.com'
         email_list = os.environ.get('THEMIS_EMAIL_RECIPIENTS')
-        to_emails = []
-        for email in email_list.split(','):
-          to_emails.append(email)
+        to_emails = [email for email in email_list.split(',')]
     except Exception as e:
         print("Missing THEMIS_EMAIL_RECIPIENTS Variables {}".format(e))
 
